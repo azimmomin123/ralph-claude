@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   LayoutGrid,
@@ -13,9 +13,13 @@ import {
   HelpCircle,
   Menu,
   X,
+  LogOut,
+  User,
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/components/auth-provider";
+import { useEffect } from "react";
 
 const navItems = [
   { href: "/", icon: Home, label: "Home" },
@@ -28,7 +32,53 @@ const navItems = [
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { user, loading, signOut } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!loading && !user && pathname.startsWith("/dashboard")) {
+      router.push("/login");
+    }
+  }, [user, loading, pathname, router]);
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const getUserInitials = () => {
+    if (user?.user_metadata?.full_name) {
+      return user.user_metadata.full_name
+        .split(" ")
+        .map((n: string) => n[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2);
+    }
+    if (user?.email) {
+      return user.email.slice(0, 2).toUpperCase();
+    }
+    return "U";
+  };
+
+  const getUserDisplayName = () => {
+    return user?.user_metadata?.full_name || user?.email?.split("@")[0] || "User";
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+    router.push("/login");
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
@@ -51,9 +101,27 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             </div>
           </div>
 
+          {/* User info */}
+          <div className="px-4 py-4 border-b border-gray-100">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-full flex items-center justify-center text-white font-medium text-sm">
+                {getUserInitials()}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-gray-900 truncate">
+                  {getUserDisplayName()}
+                </p>
+                <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+              </div>
+            </div>
+          </div>
+
           {/* Navigation */}
-          <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
-            {navItems.map((item) => {
+          <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
+            <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-4">
+              Dashboard
+            </div>
+            {navItems.slice(1).map((item) => {
               const Icon = item.icon;
               const isActive = pathname === item.href;
               return (
@@ -91,6 +159,13 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               <HelpCircle className="w-5 h-5" />
               Help
             </Link>
+            <button
+              onClick={handleSignOut}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 transition-colors"
+            >
+              <LogOut className="w-5 h-5" />
+              Sign Out
+            </button>
           </div>
         </div>
       </aside>
@@ -112,11 +187,43 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               </h2>
             </div>
             <div className="flex items-center gap-4">
-              <div className="hidden sm:block text-sm text-gray-500">
-                Demo Account
-              </div>
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-full flex items-center justify-center text-white font-medium">
-                DA
+              {/* User menu */}
+              <div className="relative">
+                <button
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  className="flex items-center gap-3 p-1 rounded-lg hover:bg-gray-100 transition-colors"
+                >
+                  <div className="hidden sm:block text-right">
+                    <p className="text-sm font-medium text-gray-900">{getUserDisplayName()}</p>
+                    <p className="text-xs text-gray-500">{user?.email}</p>
+                  </div>
+                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-full flex items-center justify-center text-white font-medium">
+                    {getUserInitials()}
+                  </div>
+                </button>
+
+                {/* Dropdown */}
+                {showUserMenu && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-10"
+                      onClick={() => setShowUserMenu(false)}
+                    />
+                    <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-20">
+                      <div className="px-4 py-2 border-b border-gray-100">
+                        <p className="text-sm font-medium text-gray-900">{getUserDisplayName()}</p>
+                        <p className="text-xs text-gray-500">{user?.email}</p>
+                      </div>
+                      <button
+                        onClick={handleSignOut}
+                        className="w-full flex items-center gap-3 px-4 py-2 text-red-600 hover:bg-red-50 transition-colors"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        <span className="text-sm">Sign out</span>
+                      </button>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>

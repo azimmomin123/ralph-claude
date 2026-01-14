@@ -14,15 +14,21 @@ export default function Home() {
               </div>
               <span className="text-2xl font-bold text-gray-900">SellerHub</span>
             </div>
-            <nav className="flex items-center gap-6">
+            <nav className="flex items-center gap-4">
               <Link href="#features" className="text-gray-600 hover:text-gray-900">
                 Features
               </Link>
               <Link
-                href="/dashboard/tiles"
+                href="/login"
+                className="text-gray-600 hover:text-gray-900"
+              >
+                Sign In
+              </Link>
+              <Link
+                href="/signup"
                 className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
               >
-                Launch Demo
+                Get Started
               </Link>
             </nav>
           </div>
@@ -45,18 +51,17 @@ export default function Home() {
             </p>
             <div className="flex justify-center gap-4">
               <Link
-                href="/dashboard/tiles"
+                href="/signup"
                 className="bg-blue-600 text-white px-8 py-3 rounded-lg text-lg font-medium hover:bg-blue-700 transition-colors flex items-center gap-2"
               >
-                Try Demo Dashboard
+                Start Free Trial
                 <ArrowRight className="w-5 h-5" />
               </Link>
               <Link
-                href="https://github.com/azimmomin123/SellerHub"
-                target="_blank"
+                href="/login"
                 className="border border-gray-300 text-gray-700 px-8 py-3 rounded-lg text-lg font-medium hover:bg-gray-50 transition-colors"
               >
-                View on GitHub
+                Sign In
               </Link>
             </div>
           </div>
