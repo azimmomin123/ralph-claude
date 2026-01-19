@@ -66,32 +66,27 @@ chmod +x /usr/local/bin/ralph-claude
 
 ## Usage
 
-### 1. Create your PRD
+### 1. Create a PRD
 
-Create a `prd.json` in your scripts/ralph directory (or wherever you run from):
+Use the PRD skill to generate a detailed requirements document:
 
-```json
-{
-  "name": "My Feature",
-  "description": "What this feature does",
-  "branchName": "feature/my-feature",
-  "userStories": [
-    {
-      "id": "STORY-001",
-      "title": "First task",
-      "description": "Detailed description of what to implement",
-      "priority": 1,
-      "acceptanceCriteria": [
-        "Criteria 1",
-        "Criteria 2"
-      ],
-      "passes": false
-    }
-  ]
-}
+```
+Load the prd skill and create a PRD for [your feature description]
 ```
 
-### 2. Run Ralph
+Answer the clarifying questions. The skill saves output to `tasks/prd-[feature-name].md`.
+
+### 2. Convert PRD to Ralph format
+
+Use the Ralph skill to convert the markdown PRD to JSON:
+
+```
+Load the ralph skill and convert tasks/prd-[feature-name].md to prd.json
+```
+
+This creates `prd.json` with user stories structured for autonomous execution.
+
+### 3. Run Ralph
 
 ```bash
 ./scripts/ralph/ralph-claude.sh [max_iterations]
@@ -99,7 +94,17 @@ Create a `prd.json` in your scripts/ralph directory (or wherever you run from):
 
 Default is 10 iterations.
 
-### 3. Monitor Progress
+Ralph will:
+- Create a feature branch (from PRD `branchName`)
+- Pick the highest priority story where `passes: false`
+- Implement that single story
+- Run quality checks (typecheck, tests)
+- Commit if checks pass
+- Update `prd.json` to mark story as `passes: true`
+- Append learnings to `progress.txt`
+- Repeat until all stories pass or max iterations reached
+
+### 4. Monitor Progress
 
 ```bash
 # See which stories are done
@@ -116,10 +121,14 @@ git log --oneline -10
 
 | File | Purpose |
 |------|---------|
-| `ralph-claude.sh` | The bash loop that spawns fresh Claude instances |
+| `ralph.sh` | The bash loop that spawns fresh Claude instances |
 | `prompt.md` | Instructions given to each Claude instance |
-| `prd.json` | User stories with `passes` status |
+| `prd.json` | User stories with `passes` status (the task list) |
+| `prd.json.example` | Example PRD format for reference |
 | `progress.txt` | Append-only learnings for future iterations |
+| `skills/prd/` | Skill for generating PRDs |
+| `skills/ralph/` | Skill for converting PRDs to JSON |
+| `flowchart/` | Interactive visualization of how Ralph works |
 
 ## Critical Concepts
 
