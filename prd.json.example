@@ -1,0 +1,45 @@
+{
+  "name": "Example Feature",
+  "description": "A sample PRD showing the structure for Ralph",
+  "branchName": "feature/example-feature",
+  "userStories": [
+    {
+      "id": "STORY-001",
+      "title": "Create database schema",
+      "description": "Set up the initial database tables for the feature",
+      "priority": 1,
+      "acceptanceCriteria": [
+        "Migration file created in db/migrations/",
+        "Tables: users, orders defined",
+        "Migration runs without errors"
+      ],
+      "passes": false
+    },
+    {
+      "id": "STORY-002", 
+      "title": "Add API endpoint for orders",
+      "description": "Create REST endpoint to list and create orders",
+      "priority": 2,
+      "acceptanceCriteria": [
+        "GET /api/orders returns list of orders",
+        "POST /api/orders creates new order",
+        "Proper error handling",
+        "TypeScript types defined"
+      ],
+      "passes": false
+    },
+    {
+      "id": "STORY-003",
+      "title": "Add order list UI component",
+      "description": "Create React component to display orders",
+      "priority": 3,
+      "acceptanceCriteria": [
+        "Component renders list of orders",
+        "Loading state shown while fetching",
+        "Empty state when no orders",
+        "Verify in browser that it renders correctly"
+      ],
+      "passes": false
+    }
+  ]
+}
