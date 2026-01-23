@@ -1,0 +1,69 @@
+{
+  "name": "Phase 2.1 - Database Setup & Schema Fix",
+  "description": "Ensure PostgreSQL database exists and all required tables are created. This phase sets up the database foundation.",
+  "branchName": "ralph/database-fix",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Verify/Create Database",
+      "description": "Ensure the PostgreSQL database sellerhub-dashboard-v1 exists",
+      "priority": 1,
+      "acceptanceCriteria": [
+        "PostgreSQL is running (Docker or local)",
+        "Database sellerhub-dashboard-v1 exists",
+        "Can connect to database successfully"
+      ],
+      "passes": true
+    },
+    {
+      "id": "US-002",
+      "title": "Verify/Fix Alembic Configuration",
+      "description": "Ensure Alembic is properly configured to use our database and models",
+      "priority": 2,
+      "acceptanceCriteria": [
+        "alembic/ directory exists with env.py, versions/, script.py.mako",
+        "alembic.ini exists in backend/",
+        "env.py imports settings and Base correctly",
+        "env.py imports all models for autogenerate"
+      ],
+      "passes": true
+    },
+    {
+      "id": "US-003",
+      "title": "Create/Verify Core Models",
+      "description": "Ensure all SQLAlchemy models exist (Seller, SellerMarketplace, Vendor, SyncJob)",
+      "priority": 3,
+      "acceptanceCriteria": [
+        "app/models/__init__.py exists",
+        "app/models/seller.py with Seller, SellerMarketplace, Vendor classes",
+        "app/models/sync.py with SyncJob class",
+        "Models use SQLAlchemy 2.0 style with UUID primary keys"
+      ],
+      "passes": true
+    },
+    {
+      "id": "US-004",
+      "title": "Generate and Run Migrations",
+      "description": "Generate Alembic migration and create tables in database",
+      "priority": 4,
+      "acceptanceCriteria": [
+        "Migration file generated in alembic/versions/",
+        "alembic upgrade head runs without errors",
+        "Tables exist: sellers, seller_marketplaces, vendors, sync_jobs"
+      ],
+      "passes": true
+    },
+    {
+      "id": "US-005",
+      "title": "Verify Database Connection from FastAPI",
+      "description": "Ensure FastAPI can connect to database and query tables",
+      "priority": 5,
+      "acceptanceCriteria": [
+        "GET /health endpoint returns ok",
+        "GET /db-test endpoint returns connected status and table list",
+        "FastAPI server starts without errors"
+      ],
+      "passes": true
+    }
+  ]
+}

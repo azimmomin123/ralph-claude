@@ -1,0 +1,50 @@
+# SellerHub Dashboard Progress Log
+
+---
+## 2026-01-22 - US-002, US-003, US-004, US-005: Complete Database Setup
+
+**What was implemented:**
+- Created complete backend structure with FastAPI application
+- Set up Alembic for database migrations with proper configuration
+- Created SQLAlchemy models for Seller, SellerMarketplace, Vendor, and SyncJob
+- Generated and ran initial migration to create seller_marketplaces and vendors tables
+- Verified FastAPI can connect to PostgreSQL and query all tables
+
+**Files created:**
+- backend/requirements.txt - Python dependencies
+- backend/app/__init__.py - Package init
+- backend/app/config.py - Settings/environment variables
+- backend/app/database.py - SQLAlchemy engine and session
+- backend/app/main.py - FastAPI application with /health and /db-test endpoints
+- backend/app/models/__init__.py - Model exports
+- backend/app/models/seller.py - Seller, SellerMarketplace, Vendor models
+- backend/app/models/sync.py - SyncJob model
+- backend/alembic.ini - Alembic configuration
+- backend/alembic/env.py - Alembic environment with model imports
+- backend/alembic/versions/40f1d5bec38e_create_core_tables.py - Initial migration
+
+**Database state:**
+- Tables: sellers, seller_marketplaces, vendors, sync_jobs, listings, orders, order_items, inventory, fee_estimates, alembic_version
+- Alembic version: 40f1d5bec38e (head)
+
+**Learnings for future iterations:**
+- PostgreSQL 16 is running via Homebrew (not Docker) on this machine
+- Database URL uses `azimmomin` user without password (peer auth)
+- psql is at /opt/homebrew/Cellar/postgresql@16/16.11_1/bin/psql
+- Some tables already existed from previous phases (listings, orders, order_items, inventory, fee_estimates)
+- Migration was modified to only add missing tables without dropping existing ones
+- FastAPI server likely running on port 8000 from another process
+
+**Verification commands:**
+```bash
+# Check tables
+/opt/homebrew/Cellar/postgresql@16/16.11_1/bin/psql -U azimmomin -d "sellerhub-dashboard-v1" -c "\dt"
+
+# Check alembic version
+cd backend && source venv/bin/activate && alembic current
+
+# Test API endpoints
+curl http://localhost:8000/health
+curl http://localhost:8000/db-test
+```
+---
