@@ -1,0 +1,88 @@
+{
+  "project": "SellerHub Dashboard",
+  "branchName": "ralph/database-fix",
+  "description": "Phase 2.1 - Database Setup & Schema Fix: Ensure PostgreSQL database exists and all required tables are created via Alembic migrations.",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Verify/Create Database",
+      "description": "As a developer, I need the PostgreSQL database sellerhub-dashboard-v1 to exist so the application can store data.",
+      "acceptanceCriteria": [
+        "Docker compose is running with PostgreSQL container",
+        "Database sellerhub-dashboard-v1 exists in PostgreSQL",
+        "Can connect with: psql postgresql://postgres:postgres@localhost:5432/sellerhub-dashboard-v1",
+        "Connection returns successful query result",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": true,
+      "notes": "Database verified working via Python psycopg2. PostgreSQL 16.11 running locally. docker-compose.yml created for containerized setup."
+    },
+    {
+      "id": "US-002",
+      "title": "Verify/Fix Alembic Configuration",
+      "description": "As a developer, I need Alembic properly configured to detect and migrate our SQLAlchemy models.",
+      "acceptanceCriteria": [
+        "alembic/ directory exists in backend/ with env.py, versions/, script.py.mako",
+        "alembic/env.py imports settings to get DATABASE_URL",
+        "alembic/env.py imports Base from app.database",
+        "alembic/env.py imports all models (Seller, SellerMarketplace, Vendor, SyncJob)",
+        "alembic/env.py sets target_metadata = Base.metadata",
+        "alembic/env.py sets sqlalchemy.url from settings.DATABASE_URL",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Create/Verify Core Models",
+      "description": "As a developer, I need SQLAlchemy models for sellers, seller_marketplaces, vendors, and sync_jobs.",
+      "acceptanceCriteria": [
+        "app/models/seller.py exists with Seller, SellerMarketplace, Vendor models",
+        "Seller model has: id, supabase_user_id, email, company_name, created_at, updated_at",
+        "SellerMarketplace model has: id, seller_id FK, marketplace_id, amazon_seller_id, SP-API credential fields, is_active, last_sync_at",
+        "Vendor model has: id, seller_id FK, name, contact_name, email, phone, address, notes, is_active",
+        "app/models/sync.py exists with SyncJob model",
+        "SyncJob model has: id, seller_id FK, marketplace_id, job_type, status, records_processed/inserted/updated, error_message, timestamps",
+        "app/models/__init__.py exports all models",
+        "Typecheck passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Generate and Run Migrations",
+      "description": "As a developer, I need Alembic migrations run to create all database tables.",
+      "acceptanceCriteria": [
+        "Run alembic revision --autogenerate to generate migration (if versions/ is empty)",
+        "Run alembic upgrade head successfully",
+        "Tables exist: sellers, seller_marketplaces, vendors, sync_jobs, alembic_version",
+        "alembic current shows current revision at head",
+        "Typecheck passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Verify Database Connection from FastAPI",
+      "description": "As a developer, I need to verify FastAPI can connect to the database and query tables.",
+      "acceptanceCriteria": [
+        "Add GET /db-test endpoint to app/main.py that queries pg_tables",
+        "Endpoint uses get_db dependency from app.database",
+        "Endpoint returns list of table names in public schema",
+        "curl http://localhost:8000/db-test returns connected status with tables array",
+        "Tables array includes: sellers, seller_marketplaces, vendors, sync_jobs",
+        "Typecheck passes"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}
